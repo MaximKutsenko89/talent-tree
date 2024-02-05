@@ -1,8 +1,9 @@
 import styled from "@emotion/styled";
+import { css } from "@emotion/react";
 import arrowDisabled from "./img/down.png";
 import arrowActive from "./img/down2.png";
 import hoverImg from "./img/hover.png";
-import { css } from "@emotion/react";
+import { theme } from "./global.styled";
 
 export type Position = "default" | "end";
 
@@ -13,6 +14,15 @@ type TalentItemPops = {
   $isEmpty?: boolean;
   $full?: boolean;
 };
+export const MainTitle = styled.h1`
+  color: #fff;
+  font-family: "Open Sans", Arial, "Helvetica Neue", Helvetica, sans-serif;
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 20px 0;
+  text-align: center;
+`;
 export const TalentPoints = styled.div`
   position: absolute;
   bottom: -10px;
@@ -29,22 +39,24 @@ export const TalentItem = styled.div<TalentItemPops>`
     props.$isEmpty
       ? "transparent"
       : `url(${props.$img}) no-repeat center/cover`};
-  width: 50px;
-  height: 50px;
-  position: relative;
-  border-radius: 10px;
-  border: ${(props) => (props.$isEmpty ? "none" : "3px solid ")};
-  border-color: ${(props) => (props.$full ? "#ffd100cc" : "#3b8538")};
+  width: 40px;
+  height: 40px;
+  user-select: none;
+
+  border-radius: 5px;
+  border: ${(props) => (props.$isEmpty ? "none" : "2px solid ")};
+  border-color: ${(props) =>
+    props.$full ? theme.colors.full : theme.colors.allowed};
   pointer-events: ${(props) => (props.$isEmpty ? "none" : "all")};
   cursor: pointer;
   filter: grayscale(${(props) => (props.$disabled ? "1" : "0")});
   margin: ${(props) => (props.$position === "default" ? "0" : "0 0 0 70px")};
-  z-index: 2;
+
   ${(props) =>
     props.$full &&
     css`
       ${TalentPoints} {
-        color: #ffd100cc;
+        color: ${theme.colors.full};
       }
     `}
   &::before {
@@ -62,7 +74,7 @@ export const TalentItem = styled.div<TalentItemPops>`
 `;
 export const TalentArrow = styled.div<{ $styles: string; $active: boolean }>`
   position: absolute;
-  content: "";
+  pointer-events: none;
   background: url(${(props) => (props.$active ? arrowActive : arrowDisabled)})
     no-repeat bottom center;
   width: 100%;
@@ -70,8 +82,80 @@ export const TalentArrow = styled.div<{ $styles: string; $active: boolean }>`
   ${(props) => props.$styles && props.$styles}
 `;
 
-export const TalentWrap = styled.div`
+export const TalentWrap = styled.div<{ $columns: number; $url: string }>`
   display: grid;
-  grid-template-columns: repeat(3, 50px);
+  grid-template-columns: repeat(${(props) => props.$columns}, 50px);
   gap: 20px;
+  background: url(${(props) => props.$url}) no-repeat center/100% 100%;
+  box-shadow: inset 0 0 30px 10px #000;
+  padding: 20px;
+`;
+export const BranchWrap = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+`;
+export const BranchInner = styled.div<{ $url: string }>`
+  width: 100%;
+
+  border-radius: 10px;
+  background: #000;
+`;
+export const BranchInfoWrap = styled.div`
+  display: flex;
+  padding: 5px 10px;
+  align-items: center;
+  font-weight: 700;
+  gap: 10px;
+`;
+export const BranchInfoIcon = styled.div<{ $url: string }>`
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: url(${(props) => props.$url}) no-repeat center/cover;
+`;
+export const BranchInfoTitle = styled.div``;
+export const BranchInfoPoints = styled.div`
+  flex: 1 1 auto;
+  text-align: right;
+`;
+
+export const InfoWrap = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto 10px auto;
+  padding: 4px 10px;
+  align-items: center;
+  background-color: #101010;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 700;
+  div {
+    display: flex;
+  }
+`;
+export const InfoIcon = styled.div<{ $url: string }>`
+  width: 30px;
+  height: 30px;
+  background: url(${(props) => props.$url}) no-repeat center/cover;
+  border-radius: 50%;
+  margin: 0 10px 0 0;
+`;
+export const InfoTitle = styled.div<{ $color: string }>`
+  color: ${(props) => props.$color};
+  margin: 0 10px 0 0;
+`;
+export const InfoPointsWrap = styled.div`
+  span {
+    margin: 0 5px 0 0;
+  }
+`;
+export const InfoPointsLeft = styled.div`
+  color: #9d9d9d;
+  span {
+    color: ${theme.colors.default};
+  }
+`;
+export const InfoPoint = styled.span<{ $colored: boolean }>`
+  color: ${(props) => (!props.$colored ? "#9d9d9d" : theme.colors.default)};
 `;

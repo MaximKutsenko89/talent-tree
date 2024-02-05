@@ -1,35 +1,31 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as S from "./App.styled";
 import type { Position } from "./App.styled";
-import talentTree from "./data/dk/dk";
+import { constants, talentTree } from "./data/dk/dk";
 import { DKBranchName, DKTalentTreeType } from "./types";
-import {
-  chunkArray,
-  isAllowedToDecrementRightClick,
-  isAssociated,
-} from "./utils";
+import { isAllowedToDecrementRightClick, isAssociated } from "./utils";
+import Tooltip from "./components/tooltip/Tooltip";
 
-const TOTAL_POINTS = 71;
 function App() {
   const [data, setData] = useState<DKTalentTreeType>(talentTree);
-  const [totalPoints, setTotalPoints] = useState(TOTAL_POINTS);
+  const [totalPoints, setTotalPoints] = useState(constants.totalPoints);
   const [activeBranch, setActiveBranch] = useState<DKBranchName>("frost");
-  const [activeTalent, setActiveTalent] = useState("");
-  const [isAllowedToDecrement, setIsAllowedToDecrement] = useState<
-    boolean | null
-  >(null);
+  const [hoveredTalent, setHoveredTalent] = useState("");
+  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
+
   function resetHandler() {
     if (confirm("REST TALENT TREE ????")) {
       setData(talentTree);
-      setTotalPoints(TOTAL_POINTS);
+      setTotalPoints(constants.totalPoints);
     }
   }
+
   function leftClickHandler(
     talentName: string,
     branchName: keyof DKTalentTreeType
   ) {
     setActiveBranch(branchName);
-    setActiveTalent(talentName);
+
     setData({
       ...data,
       [branchName]: {
@@ -48,9 +44,7 @@ function App() {
                   : talent.pointsSpent + 1,
             };
           }
-          return {
-            ...talent,
-          };
+          return { ...talent };
         }),
       },
     });
@@ -62,7 +56,10 @@ function App() {
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) {
     event.preventDefault();
-    setActiveTalent(talentName);
+    const isAllowedToDecrement = isAllowedToDecrementRightClick(
+      data[branchName].talents,
+      talentName
+    );
     if (!isAllowedToDecrement) {
       return;
     }
@@ -85,9 +82,7 @@ function App() {
                   : talent.pointsSpent - 1,
             };
           }
-          return {
-            ...talent,
-          };
+          return { ...talent };
         }),
       },
     });
@@ -110,81 +105,143 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalPoints, activeBranch]);
 
-  // const rows = chunkArray(data[activeBranch].talents);
+  function handleMouseEnter(
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    talentName: string
+  ) {
+    setHoveredTalent(talentName);
+    const talentRect = (event.target as HTMLDivElement).getBoundingClientRect();
+    const { scrollX, scrollY } = window;
+    const computedTop = talentRect.top + scrollY;
+    const computedLeft = talentRect.right + scrollX;
 
-  // const rowsModified = rows.map((row, index) => ({
-  //   id: index,
-  //   names: row.map((subRow) => subRow.name),
-  //   pointsRequired: row[1].pointsRequired,
-  //   pointsSpent: row.reduce((accum, row) => (accum += row.pointsSpent), 0),
-  // }));
-  // const currentRow = rowsModified.find((row) =>
-  //   row.names.includes(activeTalent)
-  // );
-  // useEffect(() => {
-  //   if ((currentRow?.pointsSpent || 0) > 5) {
-  //     setIsAllowedToDecrement(true);
-  //   } else if (currentRow?.pointsSpent > 5 && currentRow?.id === 0) {
-  //     setIsAllowedToDecrement(true);
-  //   } else {
-  //     setIsAllowedToDecrement(false);
-  //   }
-  // }, [activeTalent, data]);
-  useEffect(() => {
-    setIsAllowedToDecrement(
-      isAllowedToDecrementRightClick(data[activeBranch].talents, activeTalent)
-    );
-  }, [activeTalent, activeBranch, data]);
+    setTooltipPosition({ top: computedTop, left: computedLeft });
+  }
+
+  function handleMouseLeave() {
+    setHoveredTalent("");
+  }
+
   return (
     <>
-      <h1>{data[activeBranch].title}</h1>
-      <div>Points left: {totalPoints}</div>
-      <div>Points spent: {data[activeBranch].pointsSpentInThisBranch}</div>
+      <S.MainTitle>{constants.title}</S.MainTitle>
       <button onClick={resetHandler}>Reset</button>
-      <S.TalentWrap>
-        {data.blood.talents.map((talent) => {
-          const isEnoughPoints = isAssociated(talent, data.blood.talents);
+      <S.InfoWrap>
+        <div>
+          <S.InfoIcon $url={constants.icon} />
+          <S.InfoTitle $color={constants.color}>{constants.name}</S.InfoTitle>
+          <S.InfoPointsWrap>
+            {Object.values(data).map((item, index) => {
+              return (
+                <>
+                  <S.InfoPoint
+                    $colored={item.pointsSpentInThisBranch > 0}
+                    key={item.title}
+                  >
+                    {item.pointsSpentInThisBranch}
+                  </S.InfoPoint>
+                  {index !== Object.entries(data).length - 1 && <span>/</span>}
+                </>
+              );
+            })}
+          </S.InfoPointsWrap>
+        </div>
+        <div>
+          <S.InfoPointsLeft>
+            Points left: <span>{totalPoints}</span>
+          </S.InfoPointsLeft>
+        </div>
+      </S.InfoWrap>
+      <S.BranchWrap>
+        {Object.entries(data).map(([key, branch]) => {
           return (
-            <S.TalentItem
-              key={talent.name}
-              $img={talent.img}
-              $position={talent.position as Position}
-              $disabled={
-                talent.childTalentWith
-                  ? !isEnoughPoints || talent.disabled
-                  : talent.disabled
-              }
-              $isEmpty={talent.isEmpty}
-              $full={talent.pointsSpent === talent.pointsTotal}
-              onClick={() =>
-                talent.disabled ||
-                talent.pointsTotal === talent.pointsSpent ||
-                (talent.childTalentWith && !isEnoughPoints)
-                  ? null
-                  : leftClickHandler(talent.name, talent.branchName)
-              }
-              onContextMenu={(event) =>
-                talent.disabled || talent.pointsSpent === 0
-                  ? event.preventDefault()
-                  : rightClickHandler(talent.name, talent.branchName, event)
-              }
-              title={`${talent.name} \n ${talent.pointsRequired} points required`}
-            >
-              {talent.childTalentWith && (
-                <S.TalentArrow
-                  $styles={talent.childTalentWith?.arrowStyles}
-                  $active={!talent.disabled}
-                />
-              )}
-              {!talent.isEmpty && (
-                <S.TalentPoints>
-                  {talent.pointsSpent}/{talent.pointsTotal}
-                </S.TalentPoints>
-              )}
-            </S.TalentItem>
+            <S.BranchInner $url={branch.backGroundImage}>
+              <S.BranchInfoWrap>
+                <S.BranchInfoIcon $url={branch.icon} />
+                <S.BranchInfoTitle>{branch.title}</S.BranchInfoTitle>
+                <S.BranchInfoPoints>
+                  {branch.pointsSpentInThisBranch} / {constants.totalPoints}
+                </S.BranchInfoPoints>
+              </S.BranchInfoWrap>
+              <S.TalentWrap
+                $columns={4}
+                key={key}
+                $url={branch.backGroundImage}
+              >
+                {branch.talents.map((talent) => {
+                  const isAssociatedValue = isAssociated(
+                    talent,
+                    branch.talents
+                  );
+                  const isAllowedToDecrement = isAllowedToDecrementRightClick(
+                    branch.talents,
+                    talent.name
+                  );
+                  return (
+                    <>
+                      <S.TalentItem
+                        key={talent.name}
+                        $img={talent.img}
+                        $position={talent.position as Position}
+                        $disabled={
+                          talent.childTalentWith
+                            ? !isAssociatedValue || talent.disabled
+                            : talent.disabled
+                        }
+                        $isEmpty={talent.isEmpty}
+                        $full={talent.pointsSpent === talent.pointsTotal}
+                        onClick={() =>
+                          talent.disabled ||
+                          talent.pointsTotal === talent.pointsSpent ||
+                          (talent.childTalentWith && !isAssociatedValue)
+                            ? null
+                            : leftClickHandler(talent.name, talent.branchName)
+                        }
+                        onContextMenu={(event) =>
+                          talent.disabled || talent.pointsSpent === 0
+                            ? event.preventDefault()
+                            : rightClickHandler(
+                                talent.name,
+                                talent.branchName,
+                                event
+                              )
+                        }
+                        onMouseEnter={(event) =>
+                          handleMouseEnter(event, talent.name)
+                        }
+                        onMouseLeave={handleMouseLeave}
+                        // onClick={(event) => handleMouseEnter(event, talent.name)}
+                      >
+                        {talent.childTalentWith && (
+                          <S.TalentArrow
+                            $styles={talent.childTalentWith?.arrowStyles}
+                            $active={!talent.disabled}
+                          />
+                        )}
+                        {!talent.isEmpty && (
+                          <S.TalentPoints>
+                            {talent.pointsSpent}/{talent.pointsTotal}
+                          </S.TalentPoints>
+                        )}
+                      </S.TalentItem>
+                      {hoveredTalent === talent.name && (
+                        <Tooltip
+                          {...talent}
+                          activeBranch={activeBranch}
+                          left={tooltipPosition.left}
+                          top={tooltipPosition.top}
+                          isAssociated={isAssociatedValue as boolean}
+                          isAllowedToDecrement={!isAllowedToDecrement}
+                        />
+                      )}
+                    </>
+                  );
+                })}
+              </S.TalentWrap>
+            </S.BranchInner>
           );
         })}
-      </S.TalentWrap>
+      </S.BranchWrap>
     </>
   );
 }

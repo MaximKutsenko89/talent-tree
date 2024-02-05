@@ -1,5 +1,15 @@
 import { css } from "@emotion/react";
 
+export const theme = {
+  colors: {
+    full: "#ffd100cc",
+    allowed: "rgba(64,191,64,0.8)",
+    transparent: "#727070",
+    default: "#fff",
+    danger: "#c41e3a",
+  },
+};
+
 const globalStyles = css`
   body {
     margin: 0;
@@ -25,7 +35,7 @@ const globalStyles = css`
     max-width: 1024px;
     margin: 0 auto;
     width: 100%;
-    padding: 0 10px;
+    padding: 20px 10px;
     @media (max-width: 990px) {
       max-width: none;
     }

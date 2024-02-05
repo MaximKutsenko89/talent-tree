@@ -1,37 +1,42 @@
 import { Talent } from "./types";
-export function chunkArray<T>(array: T[]) {
+export function chunkArray<T>(array: T[], chunkAmount: number) {
   const rows = [];
 
-  for (let i = 0; i < array.length; i += 3) {
-    const chunk = array.slice(i, i + 3);
+  for (let i = 0; i < array.length; i += chunkAmount) {
+    const chunk = array.slice(i, i + chunkAmount);
     rows.push(chunk);
   }
   return rows;
 }
 export function isAllowedToDecrementRightClick(
   array: Talent[],
-  // pointsSpentInThisBranch: number,
   talentName: string
 ) {
-  const rows = chunkArray(array);
+  const rows = chunkArray(array, 3);
 
   const rowsModified = rows.map((row, index) => ({
     id: index,
     names: row.map((subRow) => subRow.name),
     pointsRequired: row[1].pointsRequired,
     pointsSpent: row.reduce((accum, row) => (accum += row.pointsSpent), 0),
-    isAllowedToDecrement: index === 0,
   }));
-  let result: boolean | null = false;
+
   const currentRow = rowsModified.find((row) => row.names.includes(talentName));
   const activeRows = rowsModified.filter((row) => row.pointsSpent > 0);
-  const isFirstRow = currentRow?.id === 0;
 
-  if ((currentRow?.pointsSpent || 0) > 5 || currentRow?.isAllowedToDecrement) {
-    return true;
-  }
-  console.log(rowsModified);
-  return false;
+  const currentTalent = array.find((talent) => talent.name === talentName);
+  const activeChildTalentWith = array
+    .filter((talent) => talent.childTalentWith && talent.pointsSpent > 0)
+    .map((item) => item.name);
+  const isParentTo =
+    !!currentTalent?.parentTalentTo &&
+    activeChildTalentWith.includes(currentTalent.parentTalentTo.name);
+
+  const result =
+    ((currentRow?.pointsSpent || 0) > 5 && !isParentTo) ||
+    (currentRow?.id === activeRows.length - 1 && !isParentTo);
+
+  return result;
 }
 
 export function isAssociated(currentTalent: Talent, talentTree: Talent[]) {

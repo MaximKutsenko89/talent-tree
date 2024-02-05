@@ -25,7 +25,9 @@ import heartStrikeImg from "../../img/dk/blood/heartStrike.jpg";
 import mightOfMograineImg from "../../img/dk/blood/mightOfMograine.jpg";
 import bloodGorgedImg from "../../img/dk/blood/bloodGorged.jpg";
 import dancingRuneWeaponImg from "../../img/dk/blood/dancingRuneWeapon.jpg";
-
+import dk from "../../img/dk/class_deathknight.jpg";
+import bloodIcon from "../../img/dk/blood/blood.jpg";
+import bloodBg from "../../img/dk/blood/bloodBg.jpg";
 export {
   butcheryImg,
   abominationsMightImg,
@@ -54,4 +56,7 @@ export {
   vendettaImg,
   veteranImg,
   willOfTheNecropolisImg,
+  dk,
+  bloodIcon,
+  bloodBg,
 };
