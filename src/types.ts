@@ -1,5 +1,3 @@
-import { Position } from "./App.styled";
-
 export type DKBranchName = "blood" | "frost" | "unHoly";
 export type Coords = {
   top: number;
@@ -13,12 +11,12 @@ export type Talent = {
   title: string;
   pointsTotal: number;
   pointsSpent: number;
-  position: Position;
   disabled: boolean;
   pointsRequired: number;
   branchName: DKBranchName;
   childTalentWith?: {
-    index: number;
+    name: string;
+    index?: number;
     pointsRequired: number;
     arrowStyles: string;
   };
@@ -28,7 +26,7 @@ export type Talent = {
 
   isEmpty?: boolean;
   description?: string[];
-  requiredDescription?: string;
+  requiredDescription?: (value: number) => string;
   additionalDescription?: string[];
   isDisabledForRightClick?: boolean;
 };

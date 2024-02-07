@@ -1,25 +1,39 @@
 import React, { useEffect, useState } from "react";
 import * as S from "./App.styled";
-import type { Position } from "./App.styled";
 import { constants, talentTree } from "./data/dk/dk";
 import { DKBranchName, DKTalentTreeType } from "./types";
 import { isAllowedToDecrementRightClick, isAssociated } from "./utils";
 import Tooltip from "./components/tooltip/Tooltip";
 
+const storageTalentTreeString = localStorage.getItem("storageTalentTree");
+const storageTalentTree = storageTalentTreeString
+  ? JSON.parse(storageTalentTreeString)
+  : talentTree;
+
+const storageTotalPoints = Number(
+  localStorage.getItem("storageTotalPoints") || ""
+);
 function App() {
-  const [data, setData] = useState<DKTalentTreeType>(talentTree);
-  const [totalPoints, setTotalPoints] = useState(constants.totalPoints);
+  const [data, setData] = useState<DKTalentTreeType>(
+    storageTalentTree || talentTree
+  );
+  const [totalPoints, setTotalPoints] = useState(
+    storageTotalPoints || constants.totalPoints
+  );
   const [activeBranch, setActiveBranch] = useState<DKBranchName>("frost");
   const [hoveredTalent, setHoveredTalent] = useState("");
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
 
-  function resetHandler() {
+  function resetBranchHandler(branch: keyof DKTalentTreeType) {
     if (confirm("REST TALENT TREE ????")) {
-      setData(talentTree);
-      setTotalPoints(constants.totalPoints);
+      setData((prevData) => ({
+        ...prevData,
+        [branch]: talentTree[branch],
+      }));
+      const pointsSpent = data[branch].pointsSpentInThisBranch;
+      setTotalPoints((prev) => pointsSpent + prev);
     }
   }
-
   function leftClickHandler(
     talentName: string,
     branchName: keyof DKTalentTreeType
@@ -121,11 +135,15 @@ function App() {
   function handleMouseLeave() {
     setHoveredTalent("");
   }
-
+  const pointsSpentInAllBranchesTotal = Object.values(data).reduce(
+    (total, current) => (total += current.pointsSpentInThisBranch),
+    0
+  );
+  localStorage.setItem("storageTalentTree", JSON.stringify(data));
+  localStorage.setItem("storageTotalPoints", totalPoints.toString());
   return (
     <>
       <S.MainTitle>{constants.title}</S.MainTitle>
-      <button onClick={resetHandler}>Reset</button>
       <S.InfoWrap>
         <div>
           <S.InfoIcon $url={constants.icon} />
@@ -164,7 +182,7 @@ function App() {
                 </S.BranchInfoPoints>
               </S.BranchInfoWrap>
               <S.TalentWrap
-                $columns={4}
+                $columns={branch.columns}
                 key={key}
                 $url={branch.backGroundImage}
               >
@@ -177,23 +195,40 @@ function App() {
                     branch.talents,
                     talent.name
                   );
+                  const isFull = talent.pointsSpent === talent.pointsTotal;
+                  const findParentTalentPoints = branch.talents.find((item) => {
+                    if (talent.childTalentWith) {
+                      if (talent.childTalentWith.name === item.name) {
+                        return item;
+                      }
+                    }
+                  });
+                  const pointsRequiredInChildTalent =
+                    (findParentTalentPoints?.pointsTotal || 0) -
+                    (findParentTalentPoints?.pointsSpent || 0);
+                  const isAllowedToLeftClick =
+                    talent.disabled ||
+                    talent.pointsTotal === talent.pointsSpent ||
+                    (talent.childTalentWith && !isAssociatedValue) ||
+                    (pointsSpentInAllBranchesTotal === constants.totalPoints &&
+                      !isFull);
                   return (
                     <>
                       <S.TalentItem
                         key={talent.name}
                         $img={talent.img}
-                        $position={talent.position as Position}
                         $disabled={
                           talent.childTalentWith
                             ? !isAssociatedValue || talent.disabled
-                            : talent.disabled
+                            : talent.disabled ||
+                              (pointsSpentInAllBranchesTotal ===
+                                constants.totalPoints &&
+                                !isFull)
                         }
                         $isEmpty={talent.isEmpty}
-                        $full={talent.pointsSpent === talent.pointsTotal}
+                        $full={isFull}
                         onClick={() =>
-                          talent.disabled ||
-                          talent.pointsTotal === talent.pointsSpent ||
-                          (talent.childTalentWith && !isAssociatedValue)
+                          isAllowedToLeftClick
                             ? null
                             : leftClickHandler(talent.name, talent.branchName)
                         }
@@ -227,17 +262,28 @@ function App() {
                       {hoveredTalent === talent.name && (
                         <Tooltip
                           {...talent}
-                          activeBranch={activeBranch}
+                          pointsRequiredInChildTalent={
+                            pointsRequiredInChildTalent
+                          }
+                          branchName={branch.title as DKBranchName}
                           left={tooltipPosition.left}
                           top={tooltipPosition.top}
                           isAssociated={isAssociatedValue as boolean}
                           isAllowedToDecrement={!isAllowedToDecrement}
+                          isAllowedToLeftClick={isAllowedToLeftClick}
                         />
                       )}
                     </>
                   );
                 })}
               </S.TalentWrap>
+              <S.Button
+                onClick={() =>
+                  resetBranchHandler(key as keyof DKTalentTreeType)
+                }
+              >
+                <span> &times; </span> Reset
+              </S.Button>
             </S.BranchInner>
           );
         })}

@@ -7,13 +7,26 @@ import { theme } from "./global.styled";
 
 export type Position = "default" | "end";
 
-type TalentItemPops = {
-  $img: string;
-  $disabled?: boolean;
-  $position: Position;
-  $isEmpty?: boolean;
-  $full?: boolean;
-};
+export const Button = styled.button`
+  background: none;
+  border-radius: 4px;
+  border: 2px solid #404040;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  margin: 0 auto;
+  text-align: center;
+  width: calc(100% - 20px);
+  color: #9d9d9d;
+  min-height: 35px;
+  ${theme.mixins.flexCenter};
+  span {
+    color: ${theme.colors.danger};
+    margin: 0 10px 0 0;
+    font-size: 20px;
+  }
+`;
 export const MainTitle = styled.h1`
   color: #fff;
   font-family: "Open Sans", Arial, "Helvetica Neue", Helvetica, sans-serif;
@@ -34,7 +47,12 @@ export const TalentPoints = styled.div`
   font-size: 10px;
   user-select: none;
 `;
-export const TalentItem = styled.div<TalentItemPops>`
+export const TalentItem = styled.div<{
+  $img: string;
+  $disabled?: boolean;
+  $isEmpty?: boolean;
+  $full?: boolean;
+}>`
   background: ${(props) =>
     props.$isEmpty
       ? "transparent"
@@ -50,7 +68,6 @@ export const TalentItem = styled.div<TalentItemPops>`
   pointer-events: ${(props) => (props.$isEmpty ? "none" : "all")};
   cursor: pointer;
   filter: grayscale(${(props) => (props.$disabled ? "1" : "0")});
-  margin: ${(props) => (props.$position === "default" ? "0" : "0 0 0 70px")};
 
   ${(props) =>
     props.$full &&
@@ -88,6 +105,7 @@ export const TalentWrap = styled.div<{ $columns: number; $url: string }>`
   gap: 20px;
   background: url(${(props) => props.$url}) no-repeat center/100% 100%;
   box-shadow: inset 0 0 30px 10px #000;
+  justify-content: center;
   padding: 20px;
 `;
 export const BranchWrap = styled.div`
@@ -97,7 +115,7 @@ export const BranchWrap = styled.div`
 `;
 export const BranchInner = styled.div<{ $url: string }>`
   width: 100%;
-
+  padding: 10px 0;
   border-radius: 10px;
   background: #000;
 `;

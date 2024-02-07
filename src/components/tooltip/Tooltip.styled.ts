@@ -8,7 +8,6 @@ export const ToolTipRank = styled.div`
   color: ${theme.colors.transparent};
 `;
 export const ToolTipTitle = styled.div`
-  max-width: 100px;
   font-size: 14px;
 `;
 export const ToolTipSubTitle = styled.div<{ $colorVariant: TitleColorVariant }>`

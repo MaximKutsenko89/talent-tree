@@ -8,6 +8,13 @@ export const theme = {
     default: "#fff",
     danger: "#c41e3a",
   },
+  mixins: {
+    flexCenter: css`
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `,
+  },
 };
 
 const globalStyles = css`

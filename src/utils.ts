@@ -12,12 +12,12 @@ export function isAllowedToDecrementRightClick(
   array: Talent[],
   talentName: string
 ) {
-  const rows = chunkArray(array, 3);
+  const rows = chunkArray(array, 4);
 
   const rowsModified = rows.map((row, index) => ({
     id: index,
     names: row.map((subRow) => subRow.name),
-    pointsRequired: row[1].pointsRequired,
+    pointsRequired: row.find((row) => !row.isEmpty)?.pointsRequired,
     pointsSpent: row.reduce((accum, row) => (accum += row.pointsSpent), 0),
   }));
 

@@ -5,9 +5,11 @@ import * as S from "./Tooltip.styled";
 type Props = {
   top: number;
   left: number;
-  activeBranch: string;
+  branchName: string;
   isAssociated: boolean;
   isAllowedToDecrement: boolean;
+  pointsRequiredInChildTalent: number;
+  isAllowedToLeftClick: boolean;
 } & Talent;
 
 const Tooltip = (props: Props) => {
@@ -23,25 +25,26 @@ const Tooltip = (props: Props) => {
     pointsTotal,
     disabled,
     pointsRequired,
-    activeBranch,
+    branchName,
     isAssociated,
     childTalentWith,
     isAllowedToDecrement,
+    pointsRequiredInChildTalent,
+    isAllowedToLeftClick,
   } = props;
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [translateValues, setTranslateValues] = useState({ x: 1, y: -100 });
   const isFull = pointsSpent === pointsTotal;
-
   function requiredPointsHandler() {
     if (disabled) {
       return (
         <>
           <S.ToolTipSubTitle $colorVariant="danger">
-            {`Requires ${pointsRequired} points in ${activeBranch} talents`}
+            {`Requires ${pointsRequired} points in ${branchName} talents`}
           </S.ToolTipSubTitle>
           {!isAssociated && childTalentWith && (
             <S.ToolTipSubTitle $colorVariant="danger">
-              {requiredDescription}
+              {requiredDescription?.(pointsRequiredInChildTalent)}
             </S.ToolTipSubTitle>
           )}
         </>
@@ -50,7 +53,7 @@ const Tooltip = (props: Props) => {
     if (!isAssociated && childTalentWith) {
       return (
         <S.ToolTipSubTitle $colorVariant="danger">
-          {requiredDescription}
+          {requiredDescription?.(pointsRequiredInChildTalent)}
         </S.ToolTipSubTitle>
       );
     }
@@ -60,7 +63,7 @@ const Tooltip = (props: Props) => {
       </S.ToolTipSubTitle>
     ) : (
       <S.ToolTipSubTitle $colorVariant="colored">
-        Click to learn
+        {!isAllowedToLeftClick && "Click to learn"}
       </S.ToolTipSubTitle>
     );
   }
@@ -68,16 +71,17 @@ const Tooltip = (props: Props) => {
   useLayoutEffect(() => {
     const tooltipRect = tooltipRef.current?.getBoundingClientRect();
     const { innerWidth } = window;
+
     const beyondTop = (tooltipRect?.y || 0) < 0;
-    const beyondRight =
+    const beyondX =
       (tooltipRect?.x as number) + (tooltipRect?.width as number) > innerWidth;
     if (beyondTop) {
-      setTranslateValues((prev) => ({ ...prev, y: 0 }));
+      setTranslateValues((prev) => ({ ...prev, y: 11 }));
     }
-    if (beyondRight) {
+    if (beyondX) {
       setTranslateValues({ y: -100, x: -120 });
     }
-    if (beyondTop && beyondRight) {
+    if (beyondTop && beyondX) {
       setTranslateValues({ y: -1, x: -120 });
     }
   }, [pointsSpent]);
@@ -113,12 +117,15 @@ const Tooltip = (props: Props) => {
       {pointsSpent > 0 && (
         <>
           <S.ToolTipDesc>{description?.[pointsSpent - 1]}</S.ToolTipDesc>
-          {!isFull && (
-            <S.ToolTipSubTitle $colorVariant="default">
-              Next rank:
-            </S.ToolTipSubTitle>
+          {!isFull ||
+            (!isAllowedToLeftClick && (
+              <S.ToolTipSubTitle $colorVariant="default">
+                Next rank:
+              </S.ToolTipSubTitle>
+            ))}
+          {!isAllowedToLeftClick && (
+            <S.ToolTipDesc>{description?.[pointsSpent]}</S.ToolTipDesc>
           )}
-          <S.ToolTipDesc>{description?.[pointsSpent]}</S.ToolTipDesc>
         </>
       )}
       {requiredPointsHandler()}
