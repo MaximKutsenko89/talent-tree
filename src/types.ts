@@ -26,7 +26,6 @@ export type Talent = {
 
   isEmpty?: boolean;
   description?: string[];
-  requiredDescription?: (value: number) => string;
   additionalDescription?: string[];
   isDisabledForRightClick?: boolean;
 };

@@ -208,8 +208,6 @@ const bloodTalents: Talent[] = [
       "Increases the health provided by Rune Tap by 66% and lowers its cooldown by 10 sec.",
       "Increases the health provided by Rune Tap by 100% and lowers its cooldown by 10 sec.",
     ],
-    requiredDescription: (value: number) =>
-      `Requires ${value} point in Rune Tap`,
   },
   {
     name: "empty4",
@@ -351,8 +349,6 @@ const bloodTalents: Talent[] = [
       "Gives you a 2% bonus to physical damage you deal for 30 sec after dealing a critical strike from a weapon swing, spell, or ability.  This effect stacks up to 3 times.",
       "Gives you a 3% bonus to physical damage you deal for 30 sec after dealing a critical strike from a weapon swing, spell, or ability.  This effect stacks up to 3 times.",
     ],
-    requiredDescription: (value: number) =>
-      `Requires ${value} points in Dark Conviction`,
   },
   {
     name: "abominationsMight",

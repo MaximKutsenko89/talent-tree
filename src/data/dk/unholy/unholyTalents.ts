@@ -361,8 +361,6 @@ const unholyTalents: Talent[] = [
     parentTalentTo: {
       name: "ghoulFrenzy",
     },
-    requiredDescription: (value: number) =>
-      `Requires ${value} point in Night of the Dead`,
   },
   {
     name: "desolation",
@@ -404,8 +402,6 @@ const unholyTalents: Talent[] = [
       pointsRequired: 3,
       arrowStyles: "top:-22px;height:25px;",
     },
-    requiredDescription: (value: number) =>
-      `Requires ${value} point in Magic Suppression`,
   },
   {
     name: "improvedUnholyPresence",
@@ -444,8 +440,6 @@ const unholyTalents: Talent[] = [
       pointsRequired: 1,
       arrowStyles: "top:-22px;height:25px;",
     },
-    requiredDescription: (value: number) =>
-      `Requires ${value} point in Master Of Ghouls`,
   },
   {
     name: "empty5",
@@ -540,8 +534,6 @@ const unholyTalents: Talent[] = [
       pointsRequired: 3,
       arrowStyles: "top:-22px;height:25px;",
     },
-    requiredDescription: (value: number) =>
-      `Requires ${value} point in Crypt Fever`,
   },
   {
     name: "scourgeStrike",

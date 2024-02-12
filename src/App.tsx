@@ -25,13 +25,15 @@ function App() {
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
 
   function resetBranchHandler(branch: keyof DKTalentTreeType) {
-    if (confirm("REST TALENT TREE ????")) {
-      setData((prevData) => ({
-        ...prevData,
-        [branch]: talentTree[branch],
-      }));
-      const pointsSpent = data[branch].pointsSpentInThisBranch;
-      setTotalPoints((prev) => pointsSpent + prev);
+    const pointsSpent = data[branch].pointsSpentInThisBranch;
+    if (pointsSpent > 0) {
+      if (confirm("REST TALENT TREE ????")) {
+        setData((prevData) => ({
+          ...prevData,
+          [branch]: talentTree[branch],
+        }));
+        setTotalPoints((prev) => pointsSpent + prev);
+      }
     }
   }
   function leftClickHandler(

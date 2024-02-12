@@ -140,8 +140,6 @@ const frostTalents: Talent[] = [
     parentTalentTo: {
       name: "improvedIcyTalons",
     },
-    requiredDescription: (value: number) =>
-      `Requires ${value} point in Improved Icy Touch`,
     description: [
       "You leech heat from victims of your Frost Fever, so that when their melee attack speed is reduced, yours increases by 4% for the next 20 sec.",
       "You leech heat from victims of your Frost Fever, so that when their melee attack speed is reduced, yours increases by 8% for the next 20 sec.",
@@ -315,8 +313,6 @@ const frostTalents: Talent[] = [
       pointsRequired: 5,
       arrowStyles: "top: -142px; height: 148px;",
     },
-    requiredDescription: (value: number) =>
-      `Requires ${value} point in  Icy Talons`,
     description: [
       "Increases the melee haste of all party and raid members within 100 yds by 20% and your haste by an additional 5%.",
     ],

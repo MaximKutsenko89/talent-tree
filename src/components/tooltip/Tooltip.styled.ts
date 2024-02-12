@@ -4,13 +4,13 @@ import { theme } from "../../global.styled";
 
 type TitleColorVariant = "colored" | "transparent" | "default" | "danger";
 
-export const ToolTipRank = styled.div`
+export const Rank = styled.div`
   color: ${theme.colors.transparent};
 `;
-export const ToolTipTitle = styled.div`
+export const Title = styled.div`
   font-size: 14px;
 `;
-export const ToolTipSubTitle = styled.div<{ $colorVariant: TitleColorVariant }>`
+export const SubTitle = styled.div<{ $colorVariant: TitleColorVariant }>`
   font-size: 14px;
   ${(props) => {
     switch (props.$colorVariant) {
@@ -36,7 +36,7 @@ export const ToolTipSubTitle = styled.div<{ $colorVariant: TitleColorVariant }>`
     }
   }}
 `;
-export const ToolTipDesc = styled.p`
+export const Description = styled.p`
   color: ${theme.colors.full};
   margin-inline: 0 10px;
 `;
@@ -48,15 +48,15 @@ export const ToolTipAddDesc = styled.div`
     text-align: right;
   }
 `;
-export const ToolTipReqDesc = styled.p``;
-export const ToolTipTitleWrap = styled.div`
+export const ReqDesc = styled.p``;
+export const TitleWrap = styled.div`
   display: flex;
   justify-content: space-between;
   margin: 0 0 10px 0;
   align-items: center;
   font-weight: 700;
 `;
-export const TooltipInner = styled.div<{
+export const Inner = styled.div<{
   $top: number;
   $left: number;
   $x: number;

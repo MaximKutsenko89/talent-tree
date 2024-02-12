@@ -52,3 +52,16 @@ export function isAssociated(currentTalent: Talent, talentTree: Talent[]) {
     currentTalent.childTalentWith.pointsRequired;
   return isEnoughPoints;
 }
+
+export function splitCamelCaseString(str: string) {
+  const result = [...str]
+    .map((item) => {
+      const isUpperCased = item.toUpperCase() === item;
+      if (isUpperCased) {
+        return " " + item;
+      }
+      return item;
+    })
+    .join("");
+  return result.charAt(0).toUpperCase() + result.slice(1);
+}

@@ -1,6 +1,7 @@
 import { useRef, useState, useLayoutEffect } from "react";
 import { Talent } from "../../types";
-import * as S from "./Tooltip.styled";
+import * as T from "./Tooltip.styled";
+import { splitCamelCaseString } from "../../utils";
 
 type Props = {
   top: number;
@@ -20,7 +21,6 @@ const Tooltip = (props: Props) => {
     title,
     description,
     additionalDescription,
-    requiredDescription,
     pointsSpent,
     pointsTotal,
     disabled,
@@ -35,36 +35,43 @@ const Tooltip = (props: Props) => {
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [translateValues, setTranslateValues] = useState({ x: 1, y: -100 });
   const isFull = pointsSpent === pointsTotal;
+
+  function requiredDescriptionHandler(value: number) {
+    return `Requires ${value} point in ${splitCamelCaseString(
+      childTalentWith?.name as string
+    )}`;
+  }
+
   function requiredPointsHandler() {
     if (disabled) {
       return (
         <>
-          <S.ToolTipSubTitle $colorVariant="danger">
+          <T.SubTitle $colorVariant="danger">
             {`Requires ${pointsRequired} points in ${branchName} talents`}
-          </S.ToolTipSubTitle>
+          </T.SubTitle>
           {!isAssociated && childTalentWith && (
-            <S.ToolTipSubTitle $colorVariant="danger">
-              {requiredDescription?.(pointsRequiredInChildTalent)}
-            </S.ToolTipSubTitle>
+            <T.SubTitle $colorVariant="danger">
+              {requiredDescriptionHandler(pointsRequiredInChildTalent)}
+            </T.SubTitle>
           )}
         </>
       );
     }
     if (!isAssociated && childTalentWith) {
       return (
-        <S.ToolTipSubTitle $colorVariant="danger">
-          {requiredDescription?.(pointsRequiredInChildTalent)}
-        </S.ToolTipSubTitle>
+        <T.SubTitle $colorVariant="danger">
+          {requiredDescriptionHandler(pointsRequiredInChildTalent)}
+        </T.SubTitle>
       );
     }
     return isFull ? (
-      <S.ToolTipSubTitle $colorVariant="colored">
+      <T.SubTitle $colorVariant="colored">
         {isAllowedToDecrement ? "" : "Right-click to unlearn"}
-      </S.ToolTipSubTitle>
+      </T.SubTitle>
     ) : (
-      <S.ToolTipSubTitle $colorVariant="colored">
+      <T.SubTitle $colorVariant="colored">
         {!isAllowedToLeftClick && "Click to learn"}
-      </S.ToolTipSubTitle>
+      </T.SubTitle>
     );
   }
 
@@ -86,7 +93,7 @@ const Tooltip = (props: Props) => {
     }
   }, [pointsSpent]);
   return (
-    <S.TooltipInner
+    <T.Inner
       $x={translateValues.x}
       $y={translateValues.y}
       $left={left}
@@ -94,42 +101,36 @@ const Tooltip = (props: Props) => {
       key={name}
       ref={tooltipRef}
     >
-      <S.ToolTipTitleWrap>
-        <S.ToolTipTitle>{title}</S.ToolTipTitle>
-        <S.ToolTipRank>
-          Rank {pointsSpent === 0 ? 1 : pointsSpent}
-        </S.ToolTipRank>
-      </S.ToolTipTitleWrap>
-      <S.ToolTipSubTitle $colorVariant="transparent">Talent</S.ToolTipSubTitle>
+      <T.TitleWrap>
+        <T.Title>{title}</T.Title>
+        <T.Rank>Rank {pointsSpent === 0 ? 1 : pointsSpent}</T.Rank>
+      </T.TitleWrap>
+      <T.SubTitle $colorVariant="transparent">Talent</T.SubTitle>
       {additionalDescription && (
-        <S.ToolTipAddDesc>
+        <T.ToolTipAddDesc>
           {additionalDescription.map((item) => (
-            <S.ToolTipSubTitle $colorVariant="default" key={item}>
+            <T.SubTitle $colorVariant="default" key={item}>
               {item}
-            </S.ToolTipSubTitle>
+            </T.SubTitle>
           ))}
-        </S.ToolTipAddDesc>
+        </T.ToolTipAddDesc>
       )}
-      <S.ToolTipSubTitle $colorVariant="default">
-        Requires Death Knight
-      </S.ToolTipSubTitle>
-      {pointsSpent === 0 && <S.ToolTipDesc>{description?.[0]}</S.ToolTipDesc>}
+      <T.SubTitle $colorVariant="default">Requires Death Knight</T.SubTitle>
+      {pointsSpent === 0 && <T.Description>{description?.[0]}</T.Description>}
       {pointsSpent > 0 && (
         <>
-          <S.ToolTipDesc>{description?.[pointsSpent - 1]}</S.ToolTipDesc>
+          <T.Description>{description?.[pointsSpent - 1]}</T.Description>
           {!isFull ||
             (!isAllowedToLeftClick && (
-              <S.ToolTipSubTitle $colorVariant="default">
-                Next rank:
-              </S.ToolTipSubTitle>
+              <T.SubTitle $colorVariant="default">Next rank:</T.SubTitle>
             ))}
           {!isAllowedToLeftClick && (
-            <S.ToolTipDesc>{description?.[pointsSpent]}</S.ToolTipDesc>
+            <T.Description>{description?.[pointsSpent]}</T.Description>
           )}
         </>
       )}
       {requiredPointsHandler()}
-    </S.TooltipInner>
+    </T.Inner>
   );
 };
 
